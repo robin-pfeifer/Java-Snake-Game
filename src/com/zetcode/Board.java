@@ -58,11 +58,19 @@ public class Board extends JPanel implements ActionListener {
     private JButton restartButton = new JButton("Replay");
     
 
+    /**
+     * Constructs a new board.
+     */
     public Board() {
         
         initBoard();
     }
     
+    /**
+     * Initializes this board. Sets information on the shape and color of the board,
+     * adds a key listener, and gives the button an action listener.
+     * @see getGrid()
+     */
     private void initBoard() {
 
         addKeyListener(new TAdapter());
@@ -72,10 +80,16 @@ public class Board extends JPanel implements ActionListener {
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
         loadImages();
         initGame();
+        
         blueBox = (Graphics2D)backGround.getGraphics();
         getGrid();
+        
+        restartButton.addActionListener(this);
     }
 
+    /**
+     * Loads the images and sets the instance variables to store the images.
+     */
     private void loadImages() {
 
         ImageIcon iid = new ImageIcon("src/resources/dot.png");
@@ -89,10 +103,15 @@ public class Board extends JPanel implements ActionListener {
         
         ImageIcon iip = new ImageIcon("src/resources/pApple.png");
         pApple = iip.getImage();
+        
         ImageIcon iib = new ImageIcon("src/resources/blueSquare.png");
         blueSquare = iib.getImage();
     }
 
+    /**
+     * Draws the grid for the background. This method allows the grid to be drawn for any size of board,
+     * though it may be cut off if the dimensions are not multiples of RAND_POS.
+     */
     private void getGrid(){
     	for(int i = 0; i < RAND_POS; i++) {
     		for(int j = 0; j < RAND_POS; j++) {
@@ -104,6 +123,12 @@ public class Board extends JPanel implements ActionListener {
     	}
     }
     
+    /**
+     * Initializes the game. Sets the length of the snake and the positions of the dots, 
+     * finds an apple and a poison apple, and instantiates the timer and starts it.
+     * @see #locateApple()
+     * @see #locatepApple()
+     */
     private void initGame() {
 
         dots = 3;
@@ -115,12 +140,15 @@ public class Board extends JPanel implements ActionListener {
         locatepApple();
         locateApple();
         
-        
 
         timer = new Timer(DELAY, this);
         timer.start();
     }
 
+    /**
+     * Calls the super method and calls the doDrawing method.
+     * @see #doDrawing(Graphics)
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -128,6 +156,11 @@ public class Board extends JPanel implements ActionListener {
         doDrawing(g);
     }
     
+    /**
+     * Draws the background, snake, apple, and poison apples if in game, otherwise restarts the game.
+     * @param g
+     * @see #gameOver(Graphics)
+     */
     private void doDrawing(Graphics g) {
         
         if (inGame) {
@@ -154,11 +187,14 @@ public class Board extends JPanel implements ActionListener {
             gameOver(g);
             //button-related
             add(restartButton);
-            restartButton.addActionListener(this);
             revalidate();
         }        
     }
 
+    /**
+     * Draws game over messages.
+     * @param g
+     */
     private void gameOver(Graphics g) {
         
         String msg = "Game Over - Too Bad!!!";
@@ -171,9 +207,17 @@ public class Board extends JPanel implements ActionListener {
         g.setFont(small);
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 3);
         g.setFont(medium);
+        metr = getFontMetrics(medium);
         g.drawString(msg1, (B_WIDTH - metr.stringWidth(msg1)) / 2, B_HEIGHT / 2);
     }
 
+    /**
+     * Checks whether the snake has collided with the apple. 
+     * If the coordinates of the apple and the snake head are the same, increases the number of dots,
+     * increases the score, decreases the timer delay, locates a new apple, plays the apple sound,
+     * and locates a poison apple if the number of dots is a multiple of 3.
+     * @see #locatepApple()
+     */
     private void checkApple() {
 
         if ((x[0] == apple_x) && (y[0] == apple_y)) {
@@ -191,6 +235,12 @@ public class Board extends JPanel implements ActionListener {
             }
         }
     }
+    
+    /**
+     * Checks whether the snake has collided with a poison apple.
+     * If the coordinates of the snake head are the same as any pApple, 
+     * the game ends and the poison apple sound plays.
+     */
     private void checkpApple() {
     	
     	for(int i = 0; i < pApples_x.size(); i++) {
