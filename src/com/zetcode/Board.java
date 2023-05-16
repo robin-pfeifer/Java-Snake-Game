@@ -38,6 +38,7 @@ public class Board extends JPanel implements ActionListener {
     private ArrayList<Integer> pApples_x = new ArrayList<Integer>();
     private ArrayList<Integer> pApples_y = new ArrayList<Integer>();
     private int score = 0;
+    private int highScore = 0;
 
     private boolean leftDirection = false;
     private boolean rightDirection = true;
@@ -53,6 +54,7 @@ public class Board extends JPanel implements ActionListener {
     private BufferedImage backGround = new BufferedImage (B_WIDTH, B_HEIGHT, BufferedImage.TYPE_INT_RGB);
     private Graphics2D blueBox;
     private Image head;
+    private int difficulty = 1;
     
     //button-related
     private JButton restartButton = new JButton("Replay");
@@ -74,6 +76,7 @@ public class Board extends JPanel implements ActionListener {
     private void initBoard() {
 
         addKeyListener(new TAdapter());
+        restartButton.addActionListener(this);
         setBackground(Color.black);
         setFocusable(true);
 
@@ -196,11 +199,16 @@ public class Board extends JPanel implements ActionListener {
      * @param g
      */
     private void gameOver(Graphics g) {
+    	if(score > highScore) {
+    		highScore = score;
+    	}
         
         String msg = "Game Over - Too Bad!!!";
         String msg1 = "Score: " + score;
+        String msg2 = "High Score: " + highScore;
         Font small = new Font("Helvetica", Font.BOLD, 14);
         Font medium = new Font("Helvetica", Font.BOLD, 18);
+        
         FontMetrics metr = getFontMetrics(small);
 
         g.setColor(Color.white);
@@ -209,6 +217,7 @@ public class Board extends JPanel implements ActionListener {
         g.setFont(medium);
         metr = getFontMetrics(medium);
         g.drawString(msg1, (B_WIDTH - metr.stringWidth(msg1)) / 2, B_HEIGHT / 2);
+        g.drawString(msg2, (B_WIDTH - metr.stringWidth(msg2)) /2, B_HEIGHT * 2/3);
     }
 
     /**
@@ -224,7 +233,7 @@ public class Board extends JPanel implements ActionListener {
 
             dots++;
             score++;
-            timer.setDelay(timer.getDelay() - 1);
+            timer.setDelay(timer.getDelay() - difficulty);
             locateApple();
             try {
             	Sound.playAppleSound();
@@ -414,6 +423,29 @@ public class Board extends JPanel implements ActionListener {
             }
 
             else if ((key == KeyEvent.VK_DOWN) && (!((y[0] + DOT_SIZE) == y[1])) && (!upDirection)) {
+                downDirection = true;
+                rightDirection = false;
+                leftDirection = false;
+            }
+            else if ((key == KeyEvent.VK_A) && (!((x[0] - DOT_SIZE) == x[1])) && (!rightDirection)) {
+                leftDirection = true;
+                upDirection = false;
+                downDirection = false;
+            }
+
+            else if ((key == KeyEvent.VK_D) && (!((x[0] + DOT_SIZE) == x[1])) && (!leftDirection)) {
+                rightDirection = true;
+                upDirection = false;
+                downDirection = false;
+            }
+
+            else if ((key == KeyEvent.VK_W) && (!((y[0] - DOT_SIZE) == y[1])) && (!downDirection)) {
+                upDirection = true;
+                rightDirection = false;
+                leftDirection = false;
+            }
+
+            else if ((key == KeyEvent.VK_S) && (!((y[0] + DOT_SIZE) == y[1])) && (!upDirection)) {
                 downDirection = true;
                 rightDirection = false;
                 leftDirection = false;
